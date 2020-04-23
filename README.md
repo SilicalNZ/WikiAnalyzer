@@ -1,4 +1,4 @@
-LastFM API (Python wrapper)
+Fandom Wikia (Pythonic API)
 ========
 Feature important queries to the Fandom wikia, translating the responses to python specific terminology. 
 
