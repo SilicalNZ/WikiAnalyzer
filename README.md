@@ -2,7 +2,7 @@ Fandom Wikia (Pythonic API)
 ========
 Feature important queries to the Fandom wikia, translating the responses to python specific terminology. 
 
-Library is built to support the hidden API request `AsJson`. The advantage to using this over regular webscraping, is a reduction in redundant information such as ads. However, as it is an undocumented request, it is suspect to bugs. One of which being long waits with changes to the article.
+Library is built to support the hidden API request `AsJson`. The advantage to using this over regular webscraping, is a reduction in redundant information such as ads. However, as it is an undocumented request, it is subject to bugs. One of which being long waits with changes to the article.
 
 Do not use this library in current state. It is subject to dramatic response changes as I adapt the webscraping capabilities.
 
