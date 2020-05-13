@@ -115,7 +115,7 @@ class ArticleQueries(Queries):
 
     async def content(self):
         """The advantage to using this over regular webscraping, is a reduction in redundant information such as ads.
-         However, as it is an undocumented request, it is suspect to bugs.
+         However, as it is an undocumented request, it is subject to bugs.
          One of which being long waits with changes to the article"""
 
         return await self.refined_query('AsJson', self._HTMLParser.feed, ('content', ), self._identifier)
