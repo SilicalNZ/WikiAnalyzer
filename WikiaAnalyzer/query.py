@@ -11,23 +11,31 @@ from .parser import PreciseHTMLParser
 
 API_URL = 'https://{wikia}.fandom.com/api/v1/'
 RATE_LIMIT = 0.2
-RATE_LIMIT_LAST_CALL = time()
 
 
-async def request(query):
-    global RATE_LIMIT_LAST_CALL
-    global RATE_LIMIT
+class RateLimiter:
+    """ONE SUBCLASS PER DOMAIN
+       SUBCLASSES ARE SINGLETONS"""
 
+    def __init__(self):
+        self.rate_limit_last_call = time()
 
-    if RATE_LIMIT_LAST_CALL + RATE_LIMIT > time():
-        await asyncio.sleep(RATE_LIMIT)
-        return await request(query)
+    def recent_last_call(self) -> bool:
+        return self.rate_limit_last_call + RATE_LIMIT < time()
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(query) as resp:
-            assert resp.status == 200
-            RATE_LIMIT_LAST_CALL = time()
-            return await resp.json()
+    def update_last_call(self):
+        self.rate_limit_last_call = time()
+
+    async def request(self, query):
+        if not self.recent_last_call():
+            await asyncio.sleep(1)
+            return await self.request(query)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(query) as resp:
+                assert resp.status == 200
+                self.update_last_call()
+                return await resp.json()
 
 
 class Query:
@@ -57,13 +65,14 @@ class Queries:
 
     def __init__(self, wikia_sub):
         self.api_url = Query(API_URL.replace('{wikia}', wikia_sub))
+        self._request = RateLimiter().request
 
     async def query(self, method, modifiers=None):  # Uncached requests
         query = self.api_url.extend(method)
         query.base_string += '?'
         if modifiers:
             query = query.modifiers(**modifiers)
-        return await request(str(query))
+        return await self._request(str(query))
 
     async def refined_query(self, method, cls, attrs, modifiers=None):
         responses = await self.query(method, modifiers)
@@ -72,10 +81,11 @@ class Queries:
         if isinstance(responses, dict):
             return cls(**responses)
         elif isinstance(responses, list):
-            result =  [cls(**response) for response in responses]
+            result = [cls(**response) for response in responses]
             return result[0] if len(result) == 1 else result
         else:
             return cls(responses)
+
 
 class SubQueries(Queries):
     def __init__(self, wikia_name):
