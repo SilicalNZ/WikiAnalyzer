@@ -114,6 +114,9 @@ class ArticleQueries(Queries):
         return {'title': self.title}
 
     async def content(self):
+        return await self.refined_query('AsJson', lambda x: x, ('content', ), self._identifier)
+
+    async def parsed_content(self):
         """The advantage to using this over regular webscraping, is a reduction in redundant information such as ads.
          However, as it is an undocumented request, it is subject to bugs.
          One of which being long waits with changes to the article"""
