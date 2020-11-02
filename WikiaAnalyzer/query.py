@@ -1,4 +1,4 @@
-from functools import lru_cache
+from typing import Union, Tuple
 from time import time
 
 
@@ -94,7 +94,7 @@ class SubQueries(Queries):
 
     async def fetch_articles(self, **kwargs):
         """category, namespaces, limit, offset, expand"""
-        return await self.refined_query('List', Article, ('items', ), **kwargs)
+        return await self.refined_query('List', ArticleQueries, ('items', ), **kwargs)
 
     def article(self, title=None, id=None):
         return ArticleQueries(id=id, title=title)
@@ -102,13 +102,19 @@ class SubQueries(Queries):
     page = article
 
 
-class ArticleQueries(Queries):
-    def __init__(self, wikia, title=None, id=None):
+class ArticleQueries(Queries, Article):
+    def __init__(
+        self,
+        wikia: Union[str, SubQueries],
+        title: str = None,
+        id: int = None,
+        **kwargs
+    ):
         self._HTMLParser = PreciseHTMLParser()
 
         if isinstance(wikia, SubQueries):
             wikia = wikia.name
-        super().__init__(wikia)
+        Queries.__init__(self, wikia)
         self.api_url = self.api_url.extend('Articles')
         if id:
             self.id = id
@@ -116,6 +122,8 @@ class ArticleQueries(Queries):
             self.title = title
         else:
             raise ValueError('Missing page identifier')
+
+        Article.__init__(self, id=id, title=title, **kwargs)
 
     @property
     def _identifier(self):
