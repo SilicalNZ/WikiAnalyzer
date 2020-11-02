@@ -79,8 +79,8 @@ class Queries:
 
 class SubQueries(Queries):
     def __init__(self, wikia_name):
-        name = wikia_name
-        super().__init__(sub_wikia)
+        self.name = wikia_name
+        super().__init__(wikia_name)
 
     async def fetch_articles(self, **kwargs):
         """category, namespaces, limit, offset, expand"""
