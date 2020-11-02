@@ -92,11 +92,11 @@ class SubQueries(Queries):
         self.name = wikia_name
         super().__init__(wikia_name)
 
-    async def fetch_articles(self, **kwargs):
+    async def fetch_articles(self, **kwargs) -> Tuple[ArticleQueries]:
         """category, namespaces, limit, offset, expand"""
         return await self.refined_query('List', ArticleQueries, ('items', ), **kwargs)
 
-    def article(self, title=None, id=None):
+    def article(self, title=None, id=None) -> ArticleQueries:
         return ArticleQueries(id=id, title=title)
 
     page = article
@@ -131,7 +131,7 @@ class ArticleQueries(Queries, Article):
             return {'id': self.id}
         return {'title': self.title}
 
-    async def content(self):
+    async def content(self) -> str:
         return await self.refined_query('AsJson', lambda x: x, ('content', ), self._identifier)
 
     async def parsed_content(self):
