@@ -1,3 +1,5 @@
+# Wikia broke this endpoint during their migration. If you want something similiar, feel free to contact me and request access to a private scraper.
+
 Fandom Wikia (Pythonic API)
 ========
 Feature important queries to the Fandom wikia, translating the responses to python specific terminology. 
